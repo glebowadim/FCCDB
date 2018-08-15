@@ -12,6 +12,7 @@ DL_SET="${DL_SETS[$DL_SET_NAME]}"
 if [ "$DL_SET" == "" ]
 then
 	echo "No URL set found. Available URL sets: ${!DL_SETS[*]}"
+    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "No URL set found. Available URL sets: ${!DL_SETS[*]}" "" "Error"
 	exit 1
 fi
 
@@ -64,6 +65,8 @@ do
     if [ "$EX_CODE" -ne 0 ]
     then
         echo "pre-process returned non zero code: $EX_CODE. Script terminating"
+        add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "pre-process returned non zero code: $EX_CODE. Script terminating" "" "Error"
+
         exit 15
     fi
 
@@ -83,6 +86,8 @@ do
 	if [ "$EX_CODE" -ne 0 ]
 	then
 		echo "prepare-csvs returned non zero code: $EX_CODE. Script terminating"
+        add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "prepare-csvs returned non zero code: $EX_CODE. Script terminating" "" "Error"
+
 		exit 17
 	fi
 
@@ -105,6 +110,8 @@ do
     if [ "$EX_CODE" -ne 0 ]
     then
         echo "post-process-csvs returned non zero code: $EX_CODE. Script terminating"
+        add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "post-process-csvs returned non zero code: $EX_CODE. Script terminating" "" "Error"
+
         exit 18
     fi
 
@@ -121,6 +128,8 @@ do
     if [ "$EX_CODE" -ne 0 ]
     then
         echo "import-csvs returned non zero code: $EX_CODE. Script terminating"
+        add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "import-csvs returned non zero code: $EX_CODE. Script terminating" "" "Error"
+
         exit 19
     fi
 done

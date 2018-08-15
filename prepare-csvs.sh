@@ -3,6 +3,8 @@
 if [ "$#" -lt 2 ]
 then
     echo "Usage: $0 <DAT files path> <Output CSV files path>"
+    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Usage: $0 <DAT files path> <Output CSV files path>" "" "Error"
+
     exit 1
 fi
 
@@ -112,6 +114,7 @@ do
     DAT_FNAME="$(echo "$DAT_FNAME" | gawk --re-interval -v pat="^(.+)-(.+)-[0-9]{2}.dat$" 'match($0, pat, arr) {print arr[1] "-" arr[2]}')"
 
     echo "Processing ${DAT_FNAME}${PART_NUMBER}..."
+    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Processing ${DAT_FNAME}${PART_NUMBER}..." "" "Info"
 
     case "$DAT_FNAME" in
         RA-REG)

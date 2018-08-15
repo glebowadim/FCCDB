@@ -20,6 +20,8 @@ trap remove_tmp_files EXIT
 if [ "$(find "$CSV_PATH" -name '*.csv' | wc -l)" -eq 0 ]
 then
     echo "No CSV files found."
+    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "No CSV files found." "" "Warning"
+
     exit 0
 fi
 
@@ -43,6 +45,8 @@ do
     if [ "$ORDER_NUM" != "" ]
     then
         echo "Setting order $ORDER_NUM for $CSV_FNAME..."
+        add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Setting order $ORDER_NUM for $CSV_FNAME..." "" "Info"
+
         mv "$CSV_TMP_FILE" "$CSV_PATH/${ORDER_NUM}_${CSV_FNAME}.csv" || exit 42
     else
         mv "$CSV_TMP_FILE" "$CSV_FILE" || exit 42

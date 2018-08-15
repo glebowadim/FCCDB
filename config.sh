@@ -15,7 +15,6 @@ function add_log_file(){
     local LOGFILE="$6"
 
     RESPONSE=$(curl --user "$API_UN:$API_PW" -X "POST" --header "Content-Type: multipart/form-data" --silent --header "Accept: application/json" -F file=@"$LOGFILE" "$ENDPOINT_URL/api/v3/integrations/runs/logs/$PROCESS_ID/logs/file?log_level=$LOGLEVEL")
-    echo "$RESPONSE"
 }
 
 function add_log(){
@@ -28,8 +27,7 @@ function add_log(){
     local LOGLEVEL="$7"
 
     JSONLOG="{\"message\": \"$MESSAGE\", \"description\": \"$DESCRIPTION\", \"log_level_name\": \"$LOGLEVEL\"}" 
-    RESPONSE=$(curl --user "$API_UN:$API_PW" -X "POST" --header "Content-Type: application/json" --header "Accept: application/json" -d "$JSONLOG" "$ENDPOINT_URL/api/v3/integrations/runs/logs/$PROCESS_ID/logs")
-    echo "$RESPONSE"
+    RESPONSE=$(curl --user "$API_UN:$API_PW" -X "POST" --header "Content-Type: application/json" --silent --header "Accept: application/json" -d "$JSONLOG" "$ENDPOINT_URL/api/v3/integrations/runs/logs/$PROCESS_ID/logs")
 }
 
 function get_import_id(){

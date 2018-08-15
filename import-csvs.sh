@@ -2,6 +2,8 @@
 if [ "$#" -lt 3 ]
 then
     echo "Usage: $0 <CSV files path> <API username> <API password>"
+    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Usage: $0 <CSV files path> <API username> <API password>" "" "Error"
+
     exit 1
 fi
 
@@ -56,6 +58,8 @@ function run_import() {
     local WAIT_FOR_END="$5"
 
     echo "Running import [impId=$IMP_ID,impAction=$IMP_ACTION] for $CSV_FNAME..."
+    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Running import [impId=$IMP_ID,impAction=$IMP_ACTION] for $CSV_FNAME..." "" "Info"
+
     local EX_CODE
     local RESPONSE_CODE
     local PROCESS_ID
@@ -68,6 +72,8 @@ function run_import() {
         if [ "$RETRIES" -eq -1 ]
         then
             echo "Retries exceeded"
+            add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Retries exceeded" "" "Error"
+
             return 51
         fi
 
@@ -77,10 +83,14 @@ function run_import() {
         if [ "$EX_CODE" -ne 0 ]
         then
             echo "Curl returned non zero code: $EX_CODE"
+            add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Curl returned non zero code: $EX_CODE" "" "Error"
+
         fi
         if [ "$RESPONSE_CODE" -ne 200 ]
         then
             echo "Server returned non 200 response code: $RESPONSE_CODE"
+            add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Server returned non 200 response code: $RESPONSE_CODE" "" "Error"
+
             if [ -f "$CURL_OUT_FILE" ]
             then
                 >&2 echo "==============="
@@ -89,6 +99,8 @@ function run_import() {
                 rm -f "$CURL_OUT_FILE"
             fi
             echo "Waiting $WAIT_SEC_BEFORE_NEXT_RETRY sec. before next attempt..."
+            add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Waiting $WAIT_SEC_BEFORE_NEXT_RETRY sec. before next attempt..." "" "Info"
+
             sleep "$WAIT_SEC_BEFORE_NEXT_RETRY"
         else
             break
@@ -105,6 +117,8 @@ function run_import() {
         if [ "$PROCESS_ID" == "" ]
         then
             echo "Can't get process id"
+            add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Can't get process id" "" "Error"
+
             if [ -f "$CURL_OUT_FILE" ]
             then
                 >&2 echo "==============="
@@ -134,6 +148,8 @@ function run_import() {
             if [ "$RETRIES" -eq -1 ]
             then
                 echo "Retries exceeded"
+                add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Retries exceeded" "" "Error"
+
                 return 51
             fi
 
@@ -143,10 +159,14 @@ function run_import() {
             if [ "$EX_CODE" -ne 0 ]
             then
                 echo "Curl returned non zero code: $EX_CODE"
+                add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Curl returned non zero code: $EX_CODE" "" "Error"
+
             fi
             if [ "$RESPONSE_CODE" -ne 200 ]
             then
                 echo "Server returned non 200 response code: $RESPONSE_CODE"
+                add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Server returned non 200 response code: $RESPONSE_CODE" "" "Error"
+
                 if [ -f "$CURL_OUT_FILE" ]
                 then
                     >&2 echo "==============="
@@ -155,6 +175,8 @@ function run_import() {
                     rm -f "$CURL_OUT_FILE"
                 fi
                 echo "Waiting $WAIT_SEC_BEFORE_NEXT_RETRY sec. before next attempt..."
+                add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Waiting $WAIT_SEC_BEFORE_NEXT_RETRY sec. before next attempt..." "" "Info"
+
                 sleep "$WAIT_SEC_BEFORE_NEXT_RETRY"
                 continue
             else
@@ -169,16 +191,22 @@ function run_import() {
                 INTERRUPTED|NUM_CELLS_LIMIT_EXCEEDED)
                     echo
                     echo "Import run failed: $CURRENT_STATUS"
+                    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Import run failed: $CURRENT_STATUS" "" "Error"
+
                     return 54
                     ;;
                 EXECUTED_*)
                     echo
                     echo "Import run success: $CURRENT_STATUS"
+                    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Import run success: $CURRENT_STATUS" "" "Info"
+
                     return 0
                     ;;
                 *)
                     echo
                     echo "Unknown import status: $CURRENT_STATUS"
+                    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Unknown import status: $CURRENT_STATUS" "" "Error"
+
                     return 55
                     ;;
             esac
@@ -209,6 +237,8 @@ find "$CSV_PATH" -name "${CSV_PART_PREFIX}*" -delete || exit 50
 if [ "$(find "$CSV_PATH" -name '*.csv' | wc -l)" -eq 0 ]
 then
     echo "No import files found."
+    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "No import files found." "" "Warning"
+
     exit 0
 fi
 
@@ -228,11 +258,15 @@ do
     if [ "$IMP_ID" == "" ]
     then
         echo "Skipped $CSV_FNAME. No Import ID"
+        add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Skipped $CSV_FNAME. No Import ID" "" "Warning"
+
         continue
     fi
     if [ "$IMP_ACTION" == "" ]
     then
         echo "Skipped $CSV_FNAME. No Import Action"
+        add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Skipped $CSV_FNAME. No Import Action" "" "Warning"
+
         continue
     fi
 

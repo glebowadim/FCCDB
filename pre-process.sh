@@ -3,6 +3,7 @@
 if [ "$#" -lt 2 ]
 then
 	echo "Usage: $0 <URL name> <DAT files path>"
+    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Usage: $0 <URL name> <DAT files path>" "" "Error"
 	exit 20
 fi
 
@@ -126,6 +127,8 @@ case "$DL_URL_NAME" in
         ;;
     *)
         echo "Unknown URL name"
+        add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Unknown URL name" "" "Error"
+
         exit 22
         ;;
 esac
