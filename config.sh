@@ -14,11 +14,37 @@ function add_log_file(){
     local LOGLEVEL="$5"
     local LOGFILE="$6"
 
-    RESPONSE=$(curl --user "$API_UN:$API_PW" -X "POST" --header "Content-Type: multipart/form-data" --header "Accept: application/json" -F file=@"$LOGFILE" "$ENDPOINT_URL/api/v3/integrations/runs/logs/$PROCESS_ID/logs/file?log_level=$LOGLEVEL")
+    RESPONSE=$(curl --user "$API_UN:$API_PW" -X "POST" --header "Content-Type: multipart/form-data" --silent --header "Accept: application/json" -F file=@"$LOGFILE" "$ENDPOINT_URL/api/v3/integrations/runs/logs/$PROCESS_ID/logs/file?log_level=$LOGLEVEL")
     echo "$RESPONSE"
 }
 
-export ENDPOINT_URL=$(get_property $SCRIPT_DIR"/properties" "URL")
+function add_log(){
+    local API_UN="$1"
+    local API_PW="$2"
+    local ENDPOINT_URL="$3"
+    local PROCESS_ID="$4"
+    local MESSAGE="$5"
+    local DESCRIPTION="$6"
+    local LOGLEVEL="$7"
+
+    JSONLOG="{\"message\": \"$MESSAGE\", \"description\": \"$DESCRIPTION\", \"log_level_name\": \"$LOGLEVEL\"}" 
+    RESPONSE=$(curl --user "$API_UN:$API_PW" -X "POST" --header "Content-Type: application/json" --header "Accept: application/json" -d "$JSONLOG" "$ENDPOINT_URL/api/v3/integrations/runs/logs/$PROCESS_ID/logs")
+    echo "$RESPONSE"
+}
+
+function get_import_id(){
+    local API_UN="$1"
+    local API_PW="$2"
+    local ENDPOINT_URL="$3"
+    local PY_SCRIPT="$4"
+    local IMP_NAME="$5"
+
+    RESPONSE=$(curl --user "$API_UN:$API_PW" -X "GET" --header "Accept: application/json" --silent "$ENDPOINT_URL/api/v3/imports")
+    RES=$("$PY_SCRIPT" "$IMP_NAME" "$RESPONSE")
+    echo $RES
+}
+
+export ENDPOINT_URL=$(get_property $SCRIPT_DIR"/SettingsFile.integration" "URL")
 export DL_PATH="$(realpath "$SCRIPT_DIR/tmp")"
 export SDEL="|"
 export TDEL=","
@@ -29,17 +55,22 @@ export WGET_DOWNLOAD_RETRIES="30"
 export IMPORT_CURL_RETRIES="20"
 export WAIT_SEC_BEFORE_NEXT_RETRY="300"
 export DAT_CELLS_PER_FILE="5000000"
+export LOG_URL=$(get_property $SCRIPT_DIR"/SettingsFile.integration" "URL")
+export IHUB_PROCESS=$(cat "$SCRIPT_DIR/ihub_process_id")
+
+export API_UN=$(get_property $SCRIPT_DIR"/SettingsFile.integration" "UN")
+export API_PW=$(get_property $SCRIPT_DIR"/SettingsFile.integration" "PWD")
 
 typeset -A IMP_IDS
 IMP_IDS=(
     # Registration
-    [RA-REG]="10017466"
-    [CO-Tower-REG]="10017468"
-    [CO-Array-REG]="10017471"
-    [EN-REG]="10017526"
-    [HS-REG]="10017527"
-    [RE-REG]="10017529"
-    [SC-REG]="10017528"
+    [RA-REG]=$(get_import_id "$API_UN" "$API_PW" "$LOG_URL" $SCRIPT_DIR"/find_id_by_name.py" "FCC (Reg) Registration Import")
+    [CO-Tower-REG]=$(get_import_id "$API_UN" "$API_PW" "$LOG_URL" $SCRIPT_DIR"/find_id_by_name.py" "FCC (Reg) Coordinate Tower Import")
+    [CO-Array-REG]=$(get_import_id "$API_UN" "$API_PW" "$LOG_URL" $SCRIPT_DIR"/find_id_by_name.py" "FCC (Reg) Coordinate Array Import")
+    [EN-REG]=$(get_import_id "$API_UN" "$API_PW" "$LOG_URL" $SCRIPT_DIR"/find_id_by_name.py" "FCC (Reg) Entity Import")
+    [HS-REG]=$(get_import_id "$API_UN" "$API_PW" "$LOG_URL" $SCRIPT_DIR"/find_id_by_name.py" "FCC (Reg) History Import")
+    [RE-REG]=$(get_import_id "$API_UN" "$API_PW" "$LOG_URL" $SCRIPT_DIR"/find_id_by_name.py" "FCC (Reg) Remarks Import")
+    [SC-REG]=$(get_import_id "$API_UN" "$API_PW" "$LOG_URL" $SCRIPT_DIR"/find_id_by_name.py" "FCC (Reg) Special Condition")
 )
 
 typeset -A IMP_ACTIONS

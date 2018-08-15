@@ -70,6 +70,8 @@ do
     fi
 
     echo "Preprocessing $DAT_BASENAME_WO_EXT..."
+    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Preprocessing $DAT_BASENAME_WO_EXT..." "" "Info"
+
     run_awk "$DAT_FNAME" "$COL_COUNT"
 
     DAT_CELLS="$(head -n1 "$DAT_FNAME" | awk -v RS='\n' -F "$SDEL" '{print NF}')"
@@ -87,6 +89,8 @@ do
         (( DAT_LINES_PER_FILE=DAT_LINES/DAT_PARTS_COUNT ))
 
         echo "Splitting DAT file for small parts ($DAT_LINES_PER_FILE lines per file)..."
+        add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Splitting DAT file for small parts ($DAT_LINES_PER_FILE lines per file)..." "" "Info"
+
         split_dat "$DAT_FNAME" "$DAT_LINES_PER_FILE"
     fi
 done

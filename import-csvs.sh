@@ -23,8 +23,6 @@ function remove_csv_part_files() {
 trap remove_csv_part_files EXIT
 
 CSV_PATH="$1"
-API_UN="$2"
-API_PW="$3"
 
 function split_csv() {
     local CSV_FNAME="$1"
@@ -117,6 +115,7 @@ function run_import() {
             return 57
         fi
         echo "[processId=$PROCESS_ID]"
+        add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "[processId=$PROCESS_ID]" "" "Info"
 
         RETRIES="$IMPORT_CURL_RETRIES"
         while true
@@ -198,9 +197,13 @@ function test_exitcode() {
 }
 
 echo "Using API endpoint: $ENDPOINT_URL"
+add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Using API endpoint: $ENDPOINT_URL" "" "Info"
+
 echo "Using API username: $API_UN"
+add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Using API username: $API_UN" "" "Info"
 
 echo "Removing old part files..."
+add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Removing old part files..." "" "Info"
 find "$CSV_PATH" -name "${CSV_PART_PREFIX}*" -delete || exit 50
 
 if [ "$(find "$CSV_PATH" -name '*.csv' | wc -l)" -eq 0 ]
@@ -217,10 +220,8 @@ do
     IMP_ID="${IMP_IDS[$CSV_FNAME]}"
     IMP_ACTION="${IMP_ACTIONS[$CSV_FNAME]}"
 
-    LOG_URL=$(get_property $SCRIPT_DIR"/properties" "URL")
-    IHUB_PROCESS=$(cat "$SCRIPT_DIR/ihub_process_id")
     add_log_file "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Info" "$CSV_FILE"
-	
+
     # Force waiting before run next import (when running full import server return 504 after start 6+ imports concurrently)
     WAIT_FOR_END="1"
 
@@ -236,6 +237,8 @@ do
     fi
 
     echo "Importing $CSV_FNAME with action $IMP_ACTION..."
+    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Importing $CSV_FNAME with action $IMP_ACTION..." "" "Info"
+
 
     CSV_CELLS="$(head -n1 "$CSV_FILE" | awk -v RS='\n' -F "$TDEL" '{print NF}')"
     CSV_LINES="$(wc -l "$CSV_FILE" | cut -d' ' -f1)"
@@ -252,6 +255,8 @@ do
         (( CSV_LINES_PER_FILE=CSV_LINES/CSV_PARTS_COUNT ))
 
         echo "Splitting CSV file for small parts ($CSV_LINES_PER_FILE lines per file)..."
+        add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Splitting CSV file for small parts ($CSV_LINES_PER_FILE lines per file)..." "" "Info"
+
         split_csv "$CSV_FNAME" "$CSV_FILE" "$CSV_LINES_PER_FILE"
         PART_ITER=0
         for CSV_PART_FILE in $CSV_PATH/${CSV_PART_PREFIX}${CSV_FNAME}_[0-9]*

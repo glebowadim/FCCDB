@@ -24,6 +24,8 @@ then
 fi
 
 echo "Renaming CSV files for make correct imports run order..."
+add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Renaming CSV files for make correct imports run order..." "" "Info"
+
 
 for CSV_FILE in $CSV_PATH/*.csv
 do
@@ -31,6 +33,8 @@ do
     CSV_FNAME="${CSV_FNAME%.csv}"
 
     echo "Removing empty lines from $CSV_FNAME..."
+    add_log "$API_UN" "$API_PW" "$LOG_URL" "$IHUB_PROCESS" "Removing empty lines from $CSV_FNAME..." "" "Info"
+
     CSV_TMP_FILE="${CSV_FILE}.tmp"
     grep -v '^$' "$CSV_FILE" > "$CSV_TMP_FILE"
     rm -f "$CSV_FILE" || exit 41
