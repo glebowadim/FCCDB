@@ -32,12 +32,12 @@ Add new trackors to Trackor Tree.
 Set import parameters at new Imports.
 
 Add a new integration with following fields on Integration page.
-- Name: FCCDB
+- Integration Name: FCCDB
 - Command: ./import-run.sh
 - Repository URL: https://github.com/IKAMTeam/FCCDBintHub
 - Schedule: 0 0 3 * * ?
 - Settings File: SettingsFile.integration 
-- Enable: On
+- Enabled: On
 
 
 SettingsFile.integration:
